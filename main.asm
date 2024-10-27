@@ -4,26 +4,49 @@ zerar MACRO reg
 ENDM
 .model small
 .data
-    matrix  db 20 dup('-')
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db '|', 18 dup('+'), '|'
-            db 20 dup('-')
+    matrixuser      db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+                    db 20 dup('+')
+    matrixbarco
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
+                    db 20 dup('?')
 .stack 0100h
 .code
 
