@@ -25,8 +25,8 @@ ENDM
                     db 20 dup('+')
                     db 20 dup('+')
                     db 20 dup('+')
-    matrixbarco
-                    db 20 dup('?')
+    
+    matrixbarco     db 20 dup('?')
                     db 20 dup('?')
                     db 20 dup('?')
                     db 20 dup('?')
@@ -48,6 +48,7 @@ ENDM
                     db 20 dup('?')
                     db 20 dup('?')
 .stack 0100h
+                    
 .code
 
 print_matrix PROC
@@ -58,7 +59,7 @@ print_matrix PROC
     printar:
         cmp bx,20
         je pular
-        mov dl, matrix[bx + si]
+        mov dl, matrixuser[bx + si]
         int 21h
         inc bx
         jmp printar
