@@ -1,12 +1,14 @@
 title AssemblyBattleship
+
 zerar MACRO reg
     xor reg,reg
 ENDM
 .model small
 .data
-    matrixuser      db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
+    ; Matrix showed to the user
+    MATRIXUSER      db 20 dup('1')
+                    db 20 dup('1')
+                    db 20 dup('1')
                     db 20 dup('+')
                     db 20 dup('+')
                     db 20 dup('+')
@@ -26,7 +28,8 @@ ENDM
                     db 20 dup('+')
                     db 20 dup('+')
     
-    matrixbarco     db 20 dup('?')
+    ; Matrix where ships are represented
+    MATRIXSHIP      db 20 dup('?')
                     db 20 dup('?')
                     db 20 dup('?')
                     db 20 dup('?')
@@ -47,43 +50,79 @@ ENDM
                     db 20 dup('?')
                     db 20 dup('?')
                     db 20 dup('?')
+    
+    ; Send a message requesting the user input for coordinates
+    COORDINATES_REQUEST db 10,13,"Digite a coordenada do tiro (x,y): ",10,13,"$"
+    
+    ; Shot coordinates (X,Y)
+    CORDINATES_SHOT db ?,?
+
+    ; Remaining shots of user
+    TOTAL_SHOTS db ?
+
+    ; Points variable
+    SCORE db ?
+
 .stack 0100h
                     
 .code
+; Take the user input for the coordinates of the shot
+UserShot PROC
+    push ax
+    push dx
 
-print_matrix PROC
+    mov ah, 9
+    lea dx, COORDINATES_REQUEST
+    int 21h
+
+    pop dx
+    pop ax
+ret
+UserShot ENDP
+
+; Check if the shot hit the ship. In this case, give one point.
+GetItRight? PROC
+    ret
+GetItRight? ENDP
+
+PrintMatrix PROC
     mov ah, 2
     zerar bx
     zerar si
 
-    printar:
+    jmp_col:
         cmp bx,20
-        je pular
-        mov dl, matrixuser[bx + si]
+        je jmp_line
+        mov dl, MATRIXUSER[bx + si]
         int 21h
         inc bx
-        jmp printar
+        jmp jmp_col
 
-    pular:
+    jmp_line:
         cmp si,380
-        je fim
+        je finish_matrix
         mov dl, 10
         int 21h
         add si,20
         zerar bx
-        jmp printar
+        jmp jmp_col
+    
+    finish_matrix:
+    ret
+PrintMatrix ENDP
 
-    fim:
-        mov ah, 4CH
-        int 21h
-print_matrix ENDP
+; Check if all the ships were hit or if the shots are over
+Finish? PROC
+
+Finish? ENDP
 
 main PROC
     mov ax, @data
     mov ds, ax
 
-    call print_matrix
-
+    call PrintMatrix
+    call UserShot
+    call GetItRight?
     mov ah, 4CH
     int 21h 
 main ENDP
