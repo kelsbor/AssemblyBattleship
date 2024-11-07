@@ -3,53 +3,25 @@ title AssemblyBattleship
 zerar MACRO reg
     xor reg,reg
 ENDM
+
+Random MACRO
+    mov ah, 0
+    int 1ah
+
+    mov ax, dx
+    mov dx, 0
+    mov bx, 10
+    div bx
+ENDM
 .model small
 .data
     ; Matrix showed to the user
-    MATRIXUSER      db 20 dup('1')
-                    db 20 dup('1')
-                    db 20 dup('1')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
-                    db 20 dup('+')
+    MATRIXUSER      db 20 dup (20 dup('0'))
+                    
     
     ; Matrix where ships are represented
-    MATRIXSHIP      db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
-                    db 20 dup('?')
+    MATRIXSHIP      db 20 dup (20 dup('?'))
+                   
     
     ; Send a message requesting the user input for coordinates
     COORDINATES_REQUEST db 10,13,"Digite a coordenada do tiro (x,y): ",10,13,"$"
