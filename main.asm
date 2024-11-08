@@ -20,7 +20,7 @@ ENDM
                     
     
     ; Matrix where ships are represented
-    MATRIXSHIP      db 20 dup (20 dup('?'))
+    MATRIXSHIP      db 20 dup (20 dup(?))
                    
     
     ; Send a message requesting the user input for coordinates
@@ -87,6 +87,12 @@ PrintMatrix ENDP
 Finish? PROC
 
 Finish? ENDP
+
+RandomBoat proc
+
+
+
+RandomBoat endp
 
 main PROC
     mov ax, @data
