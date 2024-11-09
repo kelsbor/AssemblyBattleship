@@ -1,5 +1,5 @@
 title AssemblyBattleship
-; Fazer saida decimal para interface
+
 zerar MACRO reg
     xor reg,reg
 ENDM
@@ -34,14 +34,17 @@ print_msg MACRO msg
     int 21h
 ENDM
 
-Random400 MACRO
-    ; Generate a random number between 0 and 399
-    mov ah, 0C0h ; RAND function
+print_character MACRO char
+    mov ah, 2
+    mov dl, char
     int 21h
-    mov cx, ax ; Random number in ax
-    mov bx, 400
-    mul bx
-    mov ax, dx ; Random number in ax (0-399)
+ENDM
+
+already_hit MACRO jump
+    cmp MATRIXUSER[di], 'X'
+    je jump
+    cmp MATRIXUSER[di], '0'
+    je jump
 ENDM
 
 Random MACRO
@@ -60,7 +63,7 @@ ENDM
     MATRIXUSER      db 20 dup (20 dup('.'))
                     
     ; Matrix where ships are represented
-    MATRIXSHIP      db 20 dup (20 dup(1))
+    MATRIXSHIP      db 20 dup (20 dup(0))
                    
     ; Send a message requesting the user input for coordinates
     COORDINATES_REQUEST db 10,13,"Selecione a posicao desejada com as setas e atire com ENTER: ",10,13,"$"
@@ -73,9 +76,9 @@ ENDM
 
     ; Interface Messages
     WELCOME_MESSAGE db 10,13,"Bem vindo ao jogo da batalha naval!",10,13,"Para vencer voce deve acertar todos os navios. Boa sorte!",10,13,"$"
-    SCORE_MESSAGE db 10,13,"Pontuacao: ",10,13,"$"
+    SHIPS_MESSAGE db 10,13,"Navios Restantes: ",10,13,"$"
     SHOTS_MESSAGE db 10,13,"Tiros Restantes: ",10,13,"$"
-    PRESS_ENTER db 10,13,"Pressione ENTER para continuar",10,13,"$"
+    PRESS_KEY db 10,13,"Pressione qualquer tecla para continuar",10,13,"$"
 
     ; End of game messages
     VICTORY_MESSAGE db 10,13,"Parabens, voce venceu!",10,13,"$"
@@ -89,10 +92,10 @@ ENDM
     POSITION dw 0
 
     ; Remaining shots of user
-    TOTAL_SHOTS db 19
+    TOTAL_SHOTS dw 20
 
     ; Points variable
-    SCORE db 0
+    SHIPS dw 19
 
 .stack 0100h
                     
@@ -108,20 +111,14 @@ CursorUp PROC
 
     ; Update the MATRIXUSER
     get_coordinates ; Y (si) and X (di) ; Pos in di
-    cmp MATRIXUSER[di], 'X'
-    je fimup
-    cmp MATRIXUSER[di], '0'
-    je fimup
+    already_hit fimup
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     add di, 20  ; Move to the old Y position
-    cmp MATRIXUSER[di], 'X'
-    je fimup
-    cmp MATRIXUSER[di], '0'
-    je fimup
+    already_hit fimup
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -139,20 +136,14 @@ CursorDown PROC
 
     ; Update the MATRIXUSER
     get_coordinates
-    cmp MATRIXUSER[di], 'X'
-    je fimdown
-    cmp MATRIXUSER[di], '0'
-    je fimdown
+    already_hit fimdown
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     sub di, 20
-    cmp MATRIXUSER[di], 'X'
-    je fimdown
-    cmp MATRIXUSER[di], '0'
-    je fimdown
+    already_hit fimdown
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -170,20 +161,14 @@ CursorLeft PROC
     
     ; Update the MATRIXUSER
     get_coordinates
-    cmp MATRIXUSER[di], 'X'
-    je fimleft
-    cmp MATRIXUSER[di], '0'
-    je fimleft
+    already_hit fimleft
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     inc di
-    cmp MATRIXUSER[di], 'X'
-    je fimleft
-    cmp MATRIXUSER[di], '0'
-    je fimleft
+    already_hit fimleft
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -201,20 +186,14 @@ CursorRight PROC
 
     ; Update the MATRIXUSER
     get_coordinates
-    cmp MATRIXUSER[di], 'X'
-    je fimright
-    cmp MATRIXUSER[di], '0'
-    je fimright
+    already_hit fimright
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     dec di
-    cmp MATRIXUSER[di], 'X'
-    je fimright
-    cmp MATRIXUSER[di], '0'
-    je fimright
+    already_hit fimright
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -276,10 +255,7 @@ move_right:
 ; Get the position of the cursor
 get_position:
     mov di, POSITION
-    cmp MATRIXUSER[di], 'X'
-    je loop_start
-    cmp MATRIXUSER[di], '0'
-    je loop_start
+    already_hit loop_start
     ret
 UserShot ENDP 
 
@@ -306,8 +282,8 @@ GetItRight? PROC
     ; Message user that the shot hit
         print_msg HIT_MESSAGE
 
-    ; Increase the score
-        inc SCORE
+    ; Decrease left ships
+        dec SHIPS
 
     decrese_shots:
         dec TOTAL_SHOTS
@@ -325,10 +301,11 @@ PrintMatrix PROC
     mov dx, 184Fh
     int 10h
 
-    mov ah, 2
+    ; Print the matrix
     zerar bx
     zerar si
-
+    mov ah, 2
+    ; Print columns
     jmp_col:
         cmp bx,20
         je jmp_line
@@ -337,41 +314,70 @@ PrintMatrix PROC
         inc bx
         jmp jmp_col
 
+    ; Print lines
     jmp_line:
         cmp si,380
         je finish_matrix
-        mov dl, 10
-        int 21h
+        print_character 10
         add si,20
         zerar bx
         jmp jmp_col
     
     finish_matrix:
-        mov dl, 10
-        int 21h
+        print_character 10
     ret
 PrintMatrix ENDP
 
 ; Check if all the ships were hit or if the shots are over
 Results PROC
     ; Show status for the user
-    print_msg SCORE_MESSAGE
-    mov ah,2
-    mov dl, SCORE
-    or dl, 30h
-    int 21h
+    print_msg SHIPS_MESSAGE
+    mov ax, SHIPS
+    call saidec
 
     print_msg SHOTS_MESSAGE
-    mov ah,2
-    mov dl, TOTAL_SHOTS
-    or dl, 30h
-    int 21h
+    zerar ax
+    mov ax, TOTAL_SHOTS
+    call saidec
 
-    ; Press enter to continue
-    print_msg PRESS_ENTER
+    ; Press any key to continue
+    print_msg PRESS_KEY
     mov ah,1
     int 21h
     ret
+ENDP
+
+; Convert number in register and print it in decimal
+saidec PROC
+    mov bx, 10
+    zerar cx
+
+    ; Handle zero case
+    cmp ax, 0
+    jne positive
+    print_character 30h
+    jmp encerra
+
+    ; Handle decimal conversion
+        positive:
+            cmp ax,0        ; If quociente is zero, jump to exibir_decimal
+            je exibir_decimal
+            zerar dx        ; Zero dx to store the remainder
+            div bx          ; Divide ax by 10. Quociente in ax, remainder in dx
+            push dx         ; Store the remainder in stack
+            inc cx          
+            jmp positive
+        
+        exibir_decimal:
+            mov ah, 2
+            print:          ; Return the number in decimal
+            pop dx         
+            add dx, 30h     ; Transform to ASCII
+            int 21h
+            loop print
+    
+    encerra:
+        ret
 ENDP
 
 main PROC
@@ -390,7 +396,7 @@ main PROC
     call Results
 
     ; Verify if all the ships were hit (victory)
-    cmp SCORE, 19
+    cmp SHIPS, 0
     je victory
 
     ; Verify if all the shots are over (defeat)
