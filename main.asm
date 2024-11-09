@@ -1,5 +1,5 @@
 title AssemblyBattleship
-
+; Fazer saida decimal para interface
 zerar MACRO reg
     xor reg,reg
 ENDM
@@ -72,8 +72,9 @@ ENDM
     HIT_MESSAGE db 10,13,"Voce acertou!",10,13,"$"
 
     ; Interface Messages
+    WELCOME_MESSAGE db 10,13,"Bem vindo ao jogo da batalha naval!",10,13,"Para vencer voce deve acertar todos os navios. Boa sorte!",10,13,"$"
     SCORE_MESSAGE db 10,13,"Pontuacao: ",10,13,"$"
-    SHOTS_MESSAGE db 10,13,"Tentativas Restantes: ",10,13,"$"
+    SHOTS_MESSAGE db 10,13,"Tiros Restantes: ",10,13,"$"
     PRESS_ENTER db 10,13,"Pressione ENTER para continuar",10,13,"$"
 
     ; End of game messages
@@ -88,7 +89,7 @@ ENDM
     POSITION dw 0
 
     ; Remaining shots of user
-    TOTAL_SHOTS db 10
+    TOTAL_SHOTS db 19
 
     ; Points variable
     SCORE db 0
@@ -107,12 +108,20 @@ CursorUp PROC
 
     ; Update the MATRIXUSER
     get_coordinates ; Y (si) and X (di) ; Pos in di
+    cmp MATRIXUSER[di], 'X'
+    je fimup
+    cmp MATRIXUSER[di], '0'
+    je fimup
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     add di, 20  ; Move to the old Y position
+    cmp MATRIXUSER[di], 'X'
+    je fimup
+    cmp MATRIXUSER[di], '0'
+    je fimup
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -130,12 +139,20 @@ CursorDown PROC
 
     ; Update the MATRIXUSER
     get_coordinates
+    cmp MATRIXUSER[di], 'X'
+    je fimdown
+    cmp MATRIXUSER[di], '0'
+    je fimdown
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     sub di, 20
+    cmp MATRIXUSER[di], 'X'
+    je fimdown
+    cmp MATRIXUSER[di], '0'
+    je fimdown
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -153,12 +170,20 @@ CursorLeft PROC
     
     ; Update the MATRIXUSER
     get_coordinates
+    cmp MATRIXUSER[di], 'X'
+    je fimleft
+    cmp MATRIXUSER[di], '0'
+    je fimleft
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     inc di
+    cmp MATRIXUSER[di], 'X'
+    je fimleft
+    cmp MATRIXUSER[di], '0'
+    je fimleft
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -176,12 +201,20 @@ CursorRight PROC
 
     ; Update the MATRIXUSER
     get_coordinates
+    cmp MATRIXUSER[di], 'X'
+    je fimright
+    cmp MATRIXUSER[di], '0'
+    je fimright
     mov al, '*'
     mov MATRIXUSER[di], al
     mov POSITION, di
 
     ; Clear the old cursor position
     dec di
+    cmp MATRIXUSER[di], 'X'
+    je fimright
+    cmp MATRIXUSER[di], '0'
+    je fimright
     mov al, '.'
     mov MATRIXUSER[di], al
 
@@ -199,13 +232,6 @@ loop_start:
     ; Read keyboard input
     mov ah, 0
     int 16h
-
-    ; Verify if the position is already hit
-    mov di, POSITION
-    cmp MATRIXUSER[di], 'X'
-    je move_left
-    cmp MATRIXUSER[di], '0'
-    je move_left
 
     ; Check if the user pressed an arrow key
     cmp ah, 48h ; up arrow
@@ -249,6 +275,11 @@ move_right:
 
 ; Get the position of the cursor
 get_position:
+    mov di, POSITION
+    cmp MATRIXUSER[di], 'X'
+    je loop_start
+    cmp MATRIXUSER[di], '0'
+    je loop_start
     ret
 UserShot ENDP 
 
@@ -347,6 +378,11 @@ main PROC
     mov ax, @data
     mov ds, ax
 
+    ; Print welcome message
+    print_msg WELCOME_MESSAGE
+    call Results
+
+    ; Start the program
     program_start:
     call PrintMatrix
     call UserShot
