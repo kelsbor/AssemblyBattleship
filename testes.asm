@@ -53,10 +53,14 @@ LT1:
     div bx   ;o problema está nesta parte, em AX
     push dx
     inc cx
-    xor ah,ah
+    cmp al,20h
+    jge AXbugado
     cmp al,0
     je LP1
     jmp LT1
+
+AXbugado:
+    jmp LP1
 
 LP1:
     xor ax,ax
