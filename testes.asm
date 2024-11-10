@@ -11,7 +11,7 @@ main proc
     call transforma
     mov ah,2
 L1:
-
+    
 
     mov ah,4CH
     int 21h
@@ -23,7 +23,7 @@ random proc
 
     mov ax, dx
     mov dx, 0
-    mov bx, 10
+    mov bx, 100
     div bx
 
     mov cl,al
@@ -45,20 +45,23 @@ transforma proc
     xor ax,ax
     xor dx,dx
     xor cx,cx
+    xor bx,bx
+    mov bl,10
     mov al,arr[si]
 
 LT1:
-    div bx
+    div bx   ;o problema está nesta parte, em AX
     push dx
-    cmp al,0
-    je Tfim
     inc cx
+    xor ah,ah
+    cmp al,0
+    je LP1
     jmp LT1
 
-
+LP1:
     xor ax,ax
     mov ah,2
-LP1:
+    xor dx,dx
     pop dx
     add dl,30h
     int 21h
