@@ -105,6 +105,8 @@ ENDM
 ;Print start message, select difficulty mode and initialize the game
 program_init PROC
     print_msg WELCOME_MESSAGE
+
+    ; Select difficulty
     print_msg DIFFICULTY_MESSAGE
     mov ah, 1
     int 21h
@@ -115,6 +117,7 @@ program_init PROC
     cmp al, '3'
     je hard
 
+    ; Set total shots
     easy:
         mov TOTAL_SHOTS, 160
         jmp finish_init
@@ -128,6 +131,7 @@ program_init PROC
         jmp finish_init
 
     finish_init:
+        ; Display status
         call Results    
 program_init ENDP
 
