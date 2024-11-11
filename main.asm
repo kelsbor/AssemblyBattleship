@@ -76,6 +76,7 @@ ENDM
 
     ; Interface Messages
     WELCOME_MESSAGE db 10,13,"Bem vindo ao jogo da batalha naval!",10,13,"Para vencer voce deve acertar todos os navios. Boa sorte!",10,13,"$"
+    DIFFICULTY_MESSAGE db 10,13,"Escolha a dificuldade: (1 - Facil) (2 - Medio) (3 - Dificil): ",10,13,"$"
     SHIPS_MESSAGE db 10,13,"Navios Restantes: ",10,13,"$"
     SHOTS_MESSAGE db 10,13,"Tiros Restantes: ",10,13,"$"
     PRESS_KEY db 10,13,"Pressione qualquer tecla para continuar",10,13,"$"
@@ -92,7 +93,7 @@ ENDM
     POSITION dw 0
 
     ; Remaining shots of user
-    TOTAL_SHOTS dw 20
+    TOTAL_SHOTS dw ?
 
     ; Points variable
     SHIPS dw 19
@@ -100,6 +101,36 @@ ENDM
 .stack 0100h
                     
 .code
+
+;Print start message, select difficulty mode and initialize the game
+program_init PROC
+    print_msg WELCOME_MESSAGE
+    print_msg DIFFICULTY_MESSAGE
+    mov ah, 1
+    int 21h
+    cmp al, '1'
+    je easy
+    cmp al, '2'
+    je medium
+    cmp al, '3'
+    je hard
+
+    easy:
+        mov TOTAL_SHOTS, 160
+        jmp finish_init
+    
+    medium:
+        mov TOTAL_SHOTS, 80
+        jmp finish_init
+
+    hard:
+        mov TOTAL_SHOTS, 40
+        jmp finish_init
+
+    finish_init:
+        call Results    
+program_init ENDP
+
 ; Take the user input for the coordinates of the shot
 CursorUp PROC
     ; Check if we're already at the top row
@@ -360,15 +391,15 @@ saidec PROC
 
     ; Handle decimal conversion
         positive:
-            cmp ax,0        ; If quociente is zero, jump to exibir_decimal
-            je exibir_decimal
+            cmp ax,0        ; If quociente is zero, jump to print_decimal
+            je print_decimal
             zerar dx        ; Zero dx to store the remainder
             div bx          ; Divide ax by 10. Quociente in ax, remainder in dx
             push dx         ; Store the remainder in stack
             inc cx          
             jmp positive
         
-        exibir_decimal:
+        print_decimal:
             mov ah, 2
             print:          ; Return the number in decimal
             pop dx         
@@ -384,12 +415,11 @@ main PROC
     mov ax, @data
     mov ds, ax
 
-    ; Print welcome message
-    print_msg WELCOME_MESSAGE
-    call Results
+    ; Initialize the game
+    call program_init
 
     ; Start the program
-    program_start:
+    program_loop:
     call PrintMatrix
     call UserShot
     call GetItRight?
@@ -403,7 +433,7 @@ main PROC
     cmp TOTAL_SHOTS, 0
     je defeat
 
-    jmp program_start
+    jmp program_loop
 
     ; Print victory or defeat message
     victory:
