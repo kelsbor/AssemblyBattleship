@@ -1,9 +1,11 @@
 title AssemblyBattleship
 
+; Zero macro
 zerar MACRO reg
     xor reg,reg
 ENDM
 
+; Macros for saving and restoring registers
 push_all MACRO 
     push ax
     push bx
@@ -22,24 +24,28 @@ pop_all MACRO
     pop ax
 ENDM
 
+; macro for handling usermatrix coordinates
 get_coordinates MACRO
     mov di, X_COORDINATES
     mov si, Y_COORDINATES
     add di, si
 ENDM
 
+; macro for printing strings
 print_msg MACRO msg
     mov ah, 9
     lea dx, msg
     int 21h
 ENDM
 
+; macro for printing characters
 print_character MACRO char
     mov ah, 2
     mov dl, char
     int 21h
 ENDM
 
+; Macro for checking hit places on UserMatrix
 already_hit MACRO jump
     cmp MATRIXUSER[di], 'X'
     je jump
@@ -47,6 +53,7 @@ already_hit MACRO jump
     je jump
 ENDM
 
+; Macro for generating random numbers
 Random MACRO
     mov ah, 0
     int 1ah
@@ -63,7 +70,7 @@ ENDM
     MATRIXUSER      db 20 dup (20 dup('.'))
                     
     ; Matrix where ships are represented
-    MATRIXSHIP      db 20 dup (20 dup(0))
+    MATRIXSHIP      db 20 dup (20 dup(?))
                    
     ; Send a message requesting the user input for coordinates
     COORDINATES_REQUEST db 10,13,"Selecione a posicao desejada com as setas e atire com ENTER: ",10,13,"$"
