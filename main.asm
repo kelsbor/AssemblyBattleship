@@ -5,7 +5,7 @@ zerar MACRO reg
     xor reg,reg
 ENDM
 
-; Macros for saving and restoring registers
+; Macro for saving registers
 push_all MACRO 
     push ax
     push bx
@@ -15,6 +15,7 @@ push_all MACRO
     push di
 ENDM
 
+; Macro for restoring registers
 pop_all MACRO
     pop di
     pop si
@@ -241,6 +242,7 @@ program_init PROC
     je hard
 
     ; Set total shots
+    ; They difere based in the choosen dificulty 
     easy:
         mov TOTAL_SHOTS, 340
         jmp finish_init
@@ -259,6 +261,8 @@ program_init PROC
         call Results    
 program_init ENDP
 
+    ; Call the "Random" proc to get a randon number betwen 0 and 5
+    ; Then compare the result and go to the respective loop
 RandomMatrix PROC
     call Random
     cmp dx,0
@@ -274,7 +278,8 @@ RandomMatrix PROC
     cmp dx,5
     je Level5
 
-    Level0:
+    ; Copy the random matrix into the original "MATRIXSHIP"
+    Level0: 
         lea si, MJ0
         call copy_matrix
         jmp FRM
@@ -303,21 +308,23 @@ RandomMatrix PROC
     ret
 RandomMatrix ENDP
 
+; Get a random number
 Random PROC
     mov ah, 0 ; Function that takes the sistem time
     int 1ah   ; Receive time in cx:dx
     mov ax, dx
     zerar dx
-    mov bx, 6
+    mov bx, 6 ; Define the number to be betwen 0 and 5 in an easy way
     div bx
     ret
 ENDP
 
+; Copy a selected matrix into "MATRIXSHIP". In our case it's random
 copy_matrix PROC
     lea di, MATRIXSHIP
-    mov cx,400
+    mov cx,400 ; The matrix is 20x20
     cld
-    rep movsb
+    rep movsb ; < Main part of the PROC. Copy a number, increase 1 and loop until the last number
     ret
 ENDP
 
