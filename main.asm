@@ -4,28 +4,6 @@ zerar MACRO reg
     xor reg,reg
 ENDM
 
-Random MACRO register
-    mov ah, 0 ; Function that takes the sistem time
-    int 1ah
-
-    mov ax, dx ; Divides by 100 beacause it can be too high
-    mov dx, 0
-    mov bx, 100
-    div bx
-    zerar ah,ah
-    mov cx, ax
-
-LR1:
-    inc register
-    cmp register, 6 ; Change SI value by increasing and decreasing it
-    je LR2
-    loop LR1
-    jmp Rfim
-LR2:
-    zerar register ; ATENTION verify this line later
-    loop LR1
-Rfim:
-ENDM
 .model small
 .data
     ; All playable random matrixes
@@ -73,9 +51,9 @@ ENDM
 
     MJ2 db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0
+        db 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0
         db 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0
-        db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
-        db 0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -90,7 +68,7 @@ ENDM
         db 0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        db 0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0
+        db 0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
 
     MJ3 db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -155,27 +133,6 @@ ENDM
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-    ; Copy of MJ5 matrix with numeric characters for printing
-    MJ5Printable db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','1','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','1','1','1','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
-                  db '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'
     ; Matrix showed to the user
     MATRIXUSER      db 20 dup (20 dup('0'))
                     
@@ -213,11 +170,6 @@ UserShot PROC
 ret
 UserShot ENDP
 
-; Check if the shot hit the ship. In this case, give one point.
-GetItRight? PROC
-    ret
-GetItRight? ENDP
-
 PrintMatrix PROC
     mov ah, 2
     zerar bx
@@ -245,63 +197,67 @@ PrintMatrix PROC
     ret
 PrintMatrix ENDP
 
-; Check if all the ships were hit or if the shots are over
-Finish? PROC
-
-Finish? ENDP
+Random PROC
+    mov ah, 0 ; Function that takes the sistem time
+    int 1ah   ; Receive time in cx:dx
+    mov ax, dx
+    zerar dx
+    mov bx, 6
+    div bx
+    ret
+ENDP
 
 RandomMatrix PROC
-    Random si
-    ;lea di, MATRIXSHIP ; Load the address of the destination matrix
-    mov cx, 400 ; Repeat for the size of the matrix
-    cmp si,0
+    call Random
+    cmp dx,0
     je Level0
-    cmp si,1
+    cmp dx,1
     je Level1
-    cmp si,2
+    cmp dx,2
     je Level2
-    cmp si,3
+    cmp dx,3
     je Level3
-    cmp si,4
+    cmp dx,4
     je Level4
-    cmp si,5
+    cmp dx,5
     je Level5
 
 Level0:
     lea si, MJ0
-    call CopyMatrix
+    call copy_matrix
     jmp FRM
 Level1:
     lea si, MJ1
-    call CopyMatrix
+    call copy_matrix
     jmp FRM
 Level2:
     lea si, MJ2
-    call CopyMatrix    
+    call copy_matrix 
     jmp FRM
 Level3:
     lea si, MJ3
-    call CopyMatrix
+    call copy_matrix
     jmp FRM
 Level4:
     lea si, MJ4
-    call CopyMatrix
+    call copy_matrix
     jmp FRM
 Level5:
     lea si, MJ5
-    call CopyMatrix
+    call copy_matrix
     jmp FRM
 
 FRM:
 ret
 RandomMatrix ENDP
 
-CopyMatrix PROC
-    cld 
+copy_matrix PROC
     lea di, MATRIXSHIP
+    mov cx,400
+    cld
     rep movsb
     ret
-CopyMatrix ENDP
+ENDP
 
 main PROC
     mov ax, @data
@@ -311,7 +267,7 @@ main PROC
     call RandomMatrix
     call PrintMatrix
     call UserShot
-    call GetItRight?
+
     mov ah, 4CH
     int 21h 
 main ENDP
